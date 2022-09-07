@@ -12,7 +12,7 @@ import {
   CardActions
 } from "@mui/material";
 import Handlebars from "handlebars";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   createStateContext,
   useLocalStorage,
@@ -107,12 +107,18 @@ const Variables = () => {
 };
 
 const TextDataInput = () => {
+  const textRef = useRef<HTMLInputElement>(null);
+  const isInputtingVariable = useRef<boolean>(false);
   const [textRaw, setTextRaw] = useLocalStorage(
     "simple-te:textraw",
     defaultText
   );
   const [, setList] = useData();
   const [text, setText] = useText();
+  const selectionPos = useRef({
+    start: 0,
+    end: 0
+  });
 
   useDebounce(
     () => {
@@ -144,17 +150,52 @@ const TextDataInput = () => {
     } catch (e) {}
   }, [text, setList]);
 
+  const handleUpdatePosition = (e: any) => {
+    const { selectionStart: start, selectionEnd: end } = e.target;
+    selectionPos.current = { start: start || 0, end: end || 0 };
+  };
+
   return (
     <Card variant="outlined">
       <CardActions>
         <CopyButtonSnackbar text={text} />
+        <Button
+          onClick={() => {
+            const i = textRaw;
+            if (i !== undefined) {
+              setTextRaw(
+                `${i.substring(0, selectionPos.current.start)}{{}}${i.substring(
+                  selectionPos.current.end,
+                  i.length
+                )}`
+              );
+            }
+
+            isInputtingVariable.current = true;
+            textRef.current?.focus();
+          }}
+        >
+          Insert Variable
+        </Button>
       </CardActions>
       <CardContent>
         <TextField
+          inputRef={textRef}
           label="Text Message"
           multiline
           value={textRaw}
           fullWidth
+          onFocus={(e) => {
+            if (isInputtingVariable.current) {
+              setTimeout(() => {
+                e.target.selectionStart = selectionPos.current.start + 2;
+                e.target.selectionEnd = selectionPos.current.start + 2;
+                isInputtingVariable.current = false;
+              }, 100 /* give delay waiting for rerender */);
+            }
+          }}
+          onBlur={handleUpdatePosition}
+          onKeyDown={handleUpdatePosition}
           onChange={(e) => {
             setTextRaw(e.target.value);
           }}
