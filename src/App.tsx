@@ -36,7 +36,7 @@ const defaultText = `
 {{hello}}
 `;
 
-const CopyButtonSnackbar = ({ text = "" }) => {
+const CopyButtonSnackbar = ({ text = "", onCopied = () => {} }) => {
   const [isLoading, setLoading] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
@@ -46,6 +46,7 @@ const CopyButtonSnackbar = ({ text = "" }) => {
         disabled={isLoading}
         onClick={() => {
           copyToClipboard(text);
+          onCopied();
           setLoading(true);
         }}
         aria-label="copy"
@@ -310,7 +311,12 @@ const Renders = () => {
       <Stack direction="row" alignItems="center"></Stack>
       <Card variant="outlined">
         <CardActions>
-          <CopyButtonSnackbar text={compiledText} />
+          <CopyButtonSnackbar
+            text={compiledText}
+            onCopied={() => {
+              resultRef.current?.focus();
+            }}
+          />
         </CardActions>
         <CardContent>
           <TextField
@@ -320,7 +326,7 @@ const Renders = () => {
             multiline
             value={compiledText}
             InputProps={{ readOnly: true }}
-            onClick={(e) => {
+            onClick={() => {
               resultRef.current?.focus();
             }}
             onFocus={(e) => {
