@@ -17,7 +17,8 @@ import {
   createStateContext,
   useLocalStorage,
   useDebounce,
-  useCopyToClipboard
+  useCopyToClipboard,
+  useTitle
 } from "react-use";
 
 const [useText, TextProvider] = createStateContext("");
@@ -198,6 +199,7 @@ const Renders = () => {
 };
 
 export default function App() {
+  useTitle("Template String");
   return (
     <TextProvider>
       <DataProvider>
