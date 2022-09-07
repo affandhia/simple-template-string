@@ -2,7 +2,6 @@ import {
   Divider,
   Stack,
   TextField,
-  Typography,
   Button,
   Snackbar,
   Alert,
@@ -11,7 +10,9 @@ import {
   CardContent,
   CardActions,
   InputAdornment,
-  IconButton
+  IconButton,
+  Fade,
+  Typography
 } from "@mui/material";
 import Handlebars from "handlebars";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -86,7 +87,7 @@ const InputVariable = ({ variable }: { variable: string }) => {
   return (
     <TextField
       size="small"
-      variant="filled"
+      variant="outlined"
       label={variable}
       value={text}
       onChange={(e) => {
@@ -95,13 +96,15 @@ const InputVariable = ({ variable }: { variable: string }) => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton
-              onClick={() => setText("")}
-              aria-label="clear"
-              size="small"
-            >
-              <CancelIcon fontSize="small" sx={{ color: grey[400] }} />
-            </IconButton>
+            <Fade in={!!text}>
+              <IconButton
+                onClick={() => setText("")}
+                aria-label="clear"
+                size="small"
+              >
+                <CancelIcon fontSize="small" sx={{ color: grey[400] }} />
+              </IconButton>
+            </Fade>
           </InputAdornment>
         )
       }}
@@ -121,7 +124,22 @@ const Variables = () => {
   return (
     <Card variant="outlined">
       <CardActions>
-        <Stack direction="row" justifyContent="flex-end" width="100%" mr={1}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          width="100%"
+          mr={1}
+        >
+          <Typography
+            m={0}
+            variant="body1"
+            fontWeight="bold"
+            ml={1}
+            color="grey.700"
+          >
+            {"Variables"}
+          </Typography>
           <Button
             onClick={() => {
               setData(list.reduce((prev, cur) => ({ ...prev, [cur]: "" }), {}));
@@ -219,9 +237,23 @@ const TextDataInput = () => {
             isInputtingVariable.current = true;
             textRef.current?.focus();
           }}
+          size="small"
         >
           Insert Variable
         </Button>
+        <Fade in={!!textRaw}>
+          <Button
+            onClick={() => {
+              setTextRaw("");
+            }}
+            aria-label="copy"
+            size="small"
+            startIcon={<DeleteIcon />}
+            color="error"
+          >
+            {"Clear"}
+          </Button>
+        </Fade>
       </CardActions>
       <CardContent>
         <TextField
@@ -255,6 +287,7 @@ const TextDataInput = () => {
 const Renders = () => {
   const [data] = useData();
   const [text] = useText();
+  const resultRef = useRef<HTMLInputElement>(null);
 
   const compiledText = useMemo(() => {
     let strings = "";
@@ -280,9 +313,25 @@ const Renders = () => {
           <CopyButtonSnackbar text={compiledText} />
         </CardActions>
         <CardContent>
-          <Typography component="pre" variant="body1" gutterBottom>
-            {compiledText}
-          </Typography>
+          <TextField
+            fullWidth
+            label="Result"
+            inputRef={resultRef}
+            multiline
+            value={compiledText}
+            InputProps={{ readOnly: true }}
+            onClick={(e) => {
+              resultRef.current?.focus();
+            }}
+            onFocus={(e) => {
+              if (resultRef.current) {
+                setTimeout(() => {
+                  e.target.selectionStart = 0;
+                  e.target.selectionEnd = compiledText.length;
+                }, 60 /* give delay waiting for rerender */);
+              }
+            }}
+          ></TextField>
         </CardContent>
       </Card>
     </Stack>
