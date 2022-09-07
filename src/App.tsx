@@ -20,9 +20,10 @@ import {
   useCopyToClipboard
 } from "react-use";
 
-
 const [useText, TextProvider] = createStateContext("");
-const [useData, DataProvider] = createStateContext({});
+const [useData, DataProvider] = createStateContext(
+  {} as Record<string, string>
+);
 
 const defaultText = `
 {{hello}}
@@ -122,7 +123,7 @@ const TextDataInput = () => {
     try {
       Handlebars.parseWithoutProcessing(text)
         .body.filter(({ type }) => type === "MustacheStatement")
-        .map((statement) => {
+        .forEach((statement) => {
           const variable =
             // @ts-ignore
             statement.params[0]?.original || statement.path?.original;
