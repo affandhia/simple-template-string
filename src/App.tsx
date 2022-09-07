@@ -46,6 +46,7 @@ const CopyButtonSnackbar = ({ buttonText = "Copy", text = "" }) => {
         {buttonText}
       </Button>
       <Snackbar
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
         open={isLoading}
         autoHideDuration={2000}
         onClose={() => setLoading(false)}
