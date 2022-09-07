@@ -26,8 +26,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { grey } from "@mui/material/colors";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { StackedLineChartRounded } from "@mui/icons-material";
-
 const [useText, TextProvider] = createStateContext("");
 const [useData, DataProvider] = createStateContext(
   {} as Record<string, string>
