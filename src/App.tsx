@@ -9,7 +9,9 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions
+  CardActions,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
 import Handlebars from "handlebars";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -20,6 +22,11 @@ import {
   useCopyToClipboard,
   useTitle
 } from "react-use";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { grey } from "@mui/material/colors";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { StackedLineChartRounded } from "@mui/icons-material";
 
 const [useText, TextProvider] = createStateContext("");
 const [useData, DataProvider] = createStateContext(
@@ -30,21 +37,23 @@ const defaultText = `
 {{hello}}
 `;
 
-const CopyButtonSnackbar = ({ buttonText = "Copy", text = "" }) => {
+const CopyButtonSnackbar = ({ text = "" }) => {
   const [isLoading, setLoading] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
   return (
     <>
-      <Button
+      <IconButton
         disabled={isLoading}
         onClick={() => {
           copyToClipboard(text);
           setLoading(true);
         }}
+        aria-label="copy"
+        size="small"
       >
-        {buttonText}
-      </Button>
+        <ContentCopyIcon fontSize="small" sx={{ color: "primary.main" }} />
+      </IconButton>
       <Snackbar
         anchorOrigin={{ horizontal: "center", vertical: "top" }}
         open={isLoading}
@@ -61,7 +70,8 @@ const CopyButtonSnackbar = ({ buttonText = "Copy", text = "" }) => {
 
 const InputVariable = ({ variable }: { variable: string }) => {
   const [data, setData] = useData();
-  const [text, setText] = useState<string>(data[variable]);
+  const defaultValue = data[variable];
+  const [text, setText] = useState<string>(defaultValue);
 
   useDebounce(
     () => {
@@ -71,21 +81,38 @@ const InputVariable = ({ variable }: { variable: string }) => {
     [text]
   );
 
+  useEffect(() => {
+    setText(defaultValue);
+  }, [defaultValue]);
+
   return (
     <TextField
       size="small"
-      variant="standard"
+      variant="filled"
       label={variable}
       value={text}
       onChange={(e) => {
         setText(e.target.value);
+      }}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              onClick={() => setText("")}
+              aria-label="clear"
+              size="small"
+            >
+              <CancelIcon fontSize="small" sx={{ color: grey[400] }} />
+            </IconButton>
+          </InputAdornment>
+        )
       }}
     />
   );
 };
 
 const Variables = () => {
-  const [data] = useData();
+  const [data, setData] = useData();
 
   const list = useMemo(() => {
     return Object.keys(data);
@@ -95,6 +122,22 @@ const Variables = () => {
 
   return (
     <Card variant="outlined">
+      <CardActions>
+        <Stack direction="row" justifyContent="flex-end" width="100%" mr={1}>
+          <Button
+            onClick={() => {
+              setData(list.reduce((prev, cur) => ({ ...prev, [cur]: "" }), {}));
+            }}
+            aria-label="copy"
+            size="small"
+            variant="outlined"
+            startIcon={<DeleteIcon />}
+            color="error"
+          >
+            {"Clear"}
+          </Button>
+        </Stack>
+      </CardActions>
       <CardContent>
         <Stack spacing={1}>
           {list.map((i) => (
@@ -197,7 +240,7 @@ const TextDataInput = () => {
                 e.target.selectionStart = selectionPos.current.start + 2;
                 e.target.selectionEnd = selectionPos.current.start + 2;
                 isInputtingVariable.current = false;
-              }, 100 /* give delay waiting for rerender */);
+              }, 60 /* give delay waiting for rerender */);
             }
           }}
           onBlur={handleUpdatePosition}
