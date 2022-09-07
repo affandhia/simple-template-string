@@ -20,10 +20,9 @@ import {
   useCopyToClipboard
 } from "react-use";
 
+
 const [useText, TextProvider] = createStateContext("");
-const [useData, DataProvider] = createStateContext(
-  {} as Record<string, string>
-);
+const [useData, DataProvider] = createStateContext({});
 
 const defaultText = `
 {{hello}}
