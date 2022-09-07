@@ -119,6 +119,7 @@ const TextDataInput = () => {
     start: 0,
     end: 0
   });
+  const [error, setError] = useState("");
 
   useDebounce(
     () => {
@@ -147,7 +148,10 @@ const TextDataInput = () => {
 
         return newObj;
       });
-    } catch (e) {}
+      setError("");
+    } catch (e) {
+      setError("There is invalid variable");
+    }
   }, [text, setList]);
 
   const handleUpdatePosition = (e: any) => {
@@ -181,6 +185,8 @@ const TextDataInput = () => {
       <CardContent>
         <TextField
           inputRef={textRef}
+          error={!!error}
+          helperText={error}
           label="Text Message"
           multiline
           value={textRaw}
