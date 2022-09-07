@@ -123,7 +123,7 @@ const TextDataInput = () => {
     try {
       Handlebars.parseWithoutProcessing(text)
         .body.filter(({ type }) => type === "MustacheStatement")
-        .map((statement) => {
+        .forEach((statement) => {
           const variable =
             // @ts-ignore
             statement.params[0]?.original || statement.path?.original;
