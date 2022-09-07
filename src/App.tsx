@@ -91,6 +91,8 @@ const Variables = () => {
     return Object.keys(data);
   }, [data]);
 
+  if (!list.length) return null;
+
   return (
     <Card variant="outlined">
       <CardContent>
@@ -114,7 +116,7 @@ const TextDataInput = () => {
 
   useDebounce(
     () => {
-      if (textRaw) setText(textRaw);
+      setText(textRaw || "");
     },
     500,
     [textRaw]
