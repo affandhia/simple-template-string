@@ -6,6 +6,7 @@
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@emotion/react": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "^5.11.16",
@@ -23,9 +24,9 @@
     "typescript": "5.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test --env=jsdom",
     "lint": "prettier --write ./src/**/*.*",
     "eject": "react-scripts eject"
   },
